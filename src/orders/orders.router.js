@@ -8,7 +8,7 @@ const controller = require("./orders.controller")
 const methodNotAllowed = require("../errors/methodNotAllowed")
 
 
-ordersRouter.route("/:orderId").get(controller.read)
+ordersRouter.route("/:orderId").get(controller.read).put(controller.update)
 ordersRouter.route("/").get(controller.list).post(controller.create)
 
 

@@ -50,6 +50,39 @@ function orderExists(request, response, next){
         message: `Order id ${orderId} not found`
     })
 }
+// Order Id is valid if present
+function orderIdIsValidIfPresent(request, response, next){
+    const {orderId} = request.params
+    const {data: {id} = {}} = request.body
+    if(id){
+        if(id === orderId){
+            return next()
+        } else {
+         return next({
+            status: 400,
+            message: `Order id does not match route id. Dish: ${id}, Route: ${orderId}`
+        })}
+    }
+    return next()
+}
+// Status property is valid
+function statusPropertyIsValid(request, response, next){
+    const {data: {status} = {}} = request.body
+    const validStatusResponses = ["pending", "preparing", "out-for-delivery", "delivered"]
+    if(!status || !validStatusResponses.includes(status)){
+        return next({
+            status: 400,
+            message: "Order must have a status of pending, preparing, out-for-delivery, delivered"
+        })
+    }
+    if(status === "delivered"){
+        return next({
+            status: 400,
+            message: "A delivered order cannot be changed"
+        })
+    }
+    next()
+}
 //CRUDL functions
 // List function
 function list(request, response, next){
@@ -73,7 +106,16 @@ function create(request, response, next){
 function read(request, response, next){
     response.json({data: response.locals.order})
 }
-
+// Update function
+function update(request, response, next){
+    const {data: {deliverTo, mobileNumber, status, dishes} = {}} = request.body
+    const order = response.locals.order
+    order.deliverTo = deliverTo
+    order.mobileNumber = mobileNumber
+    order.status = status
+    order.dishes = dishes
+    response.json({data: order})
+}
 
 
 // Exports
@@ -88,5 +130,16 @@ module.exports = {
         dishQuantityisValid,
         create
     ],
-    read: [orderExists, read]
+    read: [orderExists, read],
+    update: [
+        orderExists,
+        orderIdIsValidIfPresent,
+        bodyDataHas("deliverTo", "Order"),
+        bodyDataHas("mobileNumber", "Order"),
+        bodyDataHas("dishes", "Order"),
+        statusPropertyIsValid,
+        dishPropertyIsValid,
+        dishQuantityisValid,
+        update
+    ]
 }
