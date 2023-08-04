@@ -31,11 +31,24 @@ function priceIsValid(request, response, next){
     }
     next()
 }
-// list function
+// Dish exists
+function dishExists(request, response, next){
+    const {dishId} = request.params
+    const foundDish = dishes.find((dish) => dish.id === dishId)
+    if(foundDish){
+        response.locals.dish = foundDish
+        return next()
+    }
+    next({
+        status: 404,
+        message: `Dish does not exist ${dishId}`
+    })
+}
+// List function
 function list(request, response, next){
     response.json({data: dishes})
 }
-// create function
+// Create function
 function create(request, response, next){
     const {data: {name, description, price, image_url} = {}} = request.body
     const newDish = {
@@ -49,7 +62,10 @@ function create(request, response, next){
     response.status(201).json({data: newDish})
 }
 
-
+// Read function
+function read(request, response, next){
+    response.json({data: response.locals.dish})
+}
 
 
 module.exports = {
@@ -61,5 +77,6 @@ module.exports = {
         bodyDataHas("image_url"),
         priceIsValid,
         create
-    ]
+    ],
+    read: [dishExists, read]
 }
