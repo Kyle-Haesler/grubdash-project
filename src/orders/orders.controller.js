@@ -43,6 +43,7 @@ function orderExists(request, response, next){
     const orderFound = orders.find((order) => order.id === orderId)
     if(orderFound){
         response.locals.order = orderFound
+        response.locals.orderId = orderId
         return next()
     }
     next({
@@ -83,6 +84,17 @@ function statusPropertyIsValid(request, response, next){
     }
     next()
 }
+// status property is valid for deletion
+function statusValidForDeletion(request, response, next){
+    const order = response.locals.order
+    if(order.status !== "pending"){
+        return next({
+            status: 400,
+            message: "An order cannot be deleted unless it is pending"
+        })
+    }
+    next()
+}
 //CRUDL functions
 // List function
 function list(request, response, next){
@@ -116,6 +128,14 @@ function update(request, response, next){
     order.dishes = dishes
     response.json({data: order})
 }
+// Destroy function
+function destroy(request, response, next){
+    const orderId = response.locals.orderId
+    const order = response.locals.order
+    const index = orders.findIndex((order) => order.id === orderId)
+    const deletedOrder = orders.splice(index, 1)
+    response.sendStatus(204)
+}
 
 
 // Exports
@@ -141,5 +161,6 @@ module.exports = {
         dishPropertyIsValid,
         dishQuantityisValid,
         update
-    ]
+    ],
+    delete: [orderExists, statusValidForDeletion, destroy]
 }
