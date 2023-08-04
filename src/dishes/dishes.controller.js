@@ -1,9 +1,23 @@
 const path = require("path");
 
-// Use the existing dishes data hello!!!
+// Use the existing dishes data
 const dishes = require(path.resolve("src/data/dishes-data"));
 
 // Use this function to assign ID's when necessary
 const nextId = require("../utils/nextId");
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
+// validation middleware functions 
+
+
+// list function
+function list(request, response, next){
+    response.json({data: dishes})
+}
+
+
+
+
+module.exports = {
+    list,
+}
