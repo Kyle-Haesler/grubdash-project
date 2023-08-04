@@ -5,21 +5,10 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 
 // Use this function to assign ID's when necessary
 const nextId = require("../utils/nextId");
+const bodyDataHas = require("../utils/bodyDataHas")
 
 // Validation Middleware Functions 
-// General body data validation
-function bodyDataHas(propertyName){
-    return function (request, response, next){
-        const {data = {}} = request.body
-        if(data[propertyName]){
-            return next()
-        }
-        next({
-            status: 400,
-            message: `Dish must include a ${propertyName}`
-        })
-    }
-}
+
 // Price is valid
 function priceIsValid(request, response, next){
     const {data: {price} = {}} = request.body
@@ -97,10 +86,10 @@ function update(request, response, next){
 module.exports = {
     list,
     create: [
-        bodyDataHas("name"),
-        bodyDataHas("description"),
-        bodyDataHas("price"),
-        bodyDataHas("image_url"),
+        bodyDataHas("name", "Dish"),
+        bodyDataHas("description", "Dish"),
+        bodyDataHas("price", "Dish"),
+        bodyDataHas("image_url", "Dish"),
         priceIsValid,
         create
     ],
@@ -108,10 +97,10 @@ module.exports = {
     update: [
         dishExists,
         dishIdIsValidIfPresent,
-        bodyDataHas("name"),
-        bodyDataHas("description"),
-        bodyDataHas("price"),
-        bodyDataHas("image_url"),
+        bodyDataHas("name", "Dish"),
+        bodyDataHas("description", "Dish"),
+        bodyDataHas("price", "Dish"),
+        bodyDataHas("image_url", "Dish"),
         priceIsValid,
         update
     ]

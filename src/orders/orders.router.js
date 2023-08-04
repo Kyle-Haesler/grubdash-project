@@ -9,7 +9,7 @@ const methodNotAllowed = require("../errors/methodNotAllowed")
 
 
 
-ordersRouter.route("/").get(controller.list)
+ordersRouter.route("/").get(controller.list).post(controller.create)
 
 
 module.exports = ordersRouter
