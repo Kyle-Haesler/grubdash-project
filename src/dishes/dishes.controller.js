@@ -7,7 +7,7 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
 
 // Validation Middleware Functions 
-// General Body Data Validation
+// General body data validation
 function bodyDataHas(propertyName){
     return function (request, response, next){
         const {data = {}} = request.body

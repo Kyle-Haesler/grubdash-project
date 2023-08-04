@@ -6,4 +6,21 @@ const orders = require(path.resolve("src/data/orders-data"));
 // Use this function to assigh ID's when necessary
 const nextId = require("../utils/nextId");
 
-// TODO: Implement the /orders handlers needed to make the tests pass
+// Validation middleware functions
+//
+
+//CRUDL functions
+// List function
+function list(request, response, next){
+    response.json({data: orders})
+}
+
+
+
+
+
+// Exports
+
+module.exports = {
+    list,
+}
