@@ -44,6 +44,22 @@ function dishExists(request, response, next){
         message: `Dish does not exist ${dishId}`
     })
 }
+// Dish Id is valid if present
+function dishIdIsValidIfPresent(request, response, next){
+    const {dishId} = request.params
+    const {data: {id} = {}} = request.body
+    if(id){
+        if(id === dishId){
+            return next()
+        } else {
+         return next({
+            status: 400,
+            message: `Dish id does not match route id. Dish: ${id}, Route: ${dishId}`
+        })}
+    }
+    return next()
+}
+// CRUDL Functions
 // List function
 function list(request, response, next){
     response.json({data: dishes})
@@ -66,8 +82,18 @@ function create(request, response, next){
 function read(request, response, next){
     response.json({data: response.locals.dish})
 }
+// Update function
+function update(request, response, next){
+    const dish = response.locals.dish
+    const {data: {name, description, price, image_url}} = request.body
+    dish.name = name
+    dish.description = description
+    dish.price = price
+    dish.image_url = image_url
+    response.json({data: dish})
+}
 
-
+// EXPORTS
 module.exports = {
     list,
     create: [
@@ -78,5 +104,15 @@ module.exports = {
         priceIsValid,
         create
     ],
-    read: [dishExists, read]
+    read: [dishExists, read],
+    update: [
+        dishExists,
+        dishIdIsValidIfPresent,
+        bodyDataHas("name"),
+        bodyDataHas("description"),
+        bodyDataHas("price"),
+        bodyDataHas("image_url"),
+        priceIsValid,
+        update
+    ]
 }
