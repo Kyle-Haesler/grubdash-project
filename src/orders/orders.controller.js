@@ -37,6 +37,19 @@ function dishQuantityisValid(request, response, next){
     }
     next()
 }
+// Order exists
+function orderExists(request, response, next){
+    const {orderId} = request.params
+    const orderFound = orders.find((order) => order.id === orderId)
+    if(orderFound){
+        response.locals.order = orderFound
+        return next()
+    }
+    next({
+        status: 404,
+        message: `Order id ${orderId} not found`
+    })
+}
 //CRUDL functions
 // List function
 function list(request, response, next){
@@ -47,7 +60,7 @@ function list(request, response, next){
 function create(request, response, next){
     const {data: {deliverTo, mobileNumber, status, dishes} = {}} = request.body
     const newOrder = {
-        id: nextId,
+        id: nextId(),
         deliverTo,
         mobileNumber,
         status,
@@ -56,7 +69,10 @@ function create(request, response, next){
     orders.push(newOrder)
     response.status(201).json({data: newOrder})
 }
-
+// Read function
+function read(request, response, next){
+    response.json({data: response.locals.order})
+}
 
 
 
@@ -71,5 +87,6 @@ module.exports = {
         dishPropertyIsValid,
         dishQuantityisValid,
         create
-    ]
+    ],
+    read: [orderExists, read]
 }
